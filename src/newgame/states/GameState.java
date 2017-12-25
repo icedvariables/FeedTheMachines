@@ -30,8 +30,20 @@ public class GameState implements State {
 	}
 
 	@Override
-	public State respondToInput(KeyEvent key) {
+	public State respondToKeyPress(KeyEvent key) {
 		System.out.println(key.getKeyChar());
+		return this;
+	}
+	
+	@Override
+	public State respondToMouseClick(int clickX, int clickY) {
+		System.out.println("Click: " + clickX + ", " + clickY);
+		return this;
+	}
+	
+	@Override
+	public State respondToMouseMove(int mouseX, int mouseY) {
+		System.out.println("Move: " + mouseX + ", " + mouseY);
 		return this;
 	}
 }

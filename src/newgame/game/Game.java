@@ -45,6 +45,14 @@ public class Game  extends JFrame implements KeyListener, MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		// When the mouse is clicked, the current state is given the coordinates of the click in characters (not pixels).
+	
+		// TODO: Potentially add a Coordinate class instead of integer arrays?
+		int[] charPos = getMouseCharPos(e.getX(), e.getY());
+		int charX = charPos[0];
+		int charY = charPos[1];
+		
+		currentState.respondToMouseClick(charX, charY);
 	}
 
 	@Override
@@ -66,7 +74,7 @@ public class Game  extends JFrame implements KeyListener, MouseListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// Allows the current state to respond to input and (if required) return a new state to become the current state.
-		currentState = currentState.respondToInput(e);
+		currentState = currentState.respondToKeyPress(e);
 	}
 
 	@Override
@@ -75,6 +83,18 @@ public class Game  extends JFrame implements KeyListener, MouseListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
+	}
+	
+	private int[] getMouseCharPos(int mouseX, int mouseY) {
+		// This takes the mouse's position in pixels and find its position in terms of characters in the terminal.
+		
+		int width = terminal.getCharWidth();
+		int height = terminal.getCharHeight();
+		
+		int charX = (int) Math.floor(mouseX / width);
+		int charY = (int) Math.floor(mouseY / height);
+		
+		return new int[] {charX, charY};
 	}
 
 	public static void main(String[] args) {
