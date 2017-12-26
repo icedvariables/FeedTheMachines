@@ -7,15 +7,18 @@ import asciiPanel.AsciiPanel;
 import newgame.game.Game;
 import newgame.gui.GameGui;
 import newgame.maps.GameMap;
+import newgame.maps.MapDrawer;
 
 public class GameState implements State {
 	public static final Color BORDER_COLOUR = Color.GREEN;
 	public static final Color TITLE_COLOUR = Color.WHITE;
 	private GameMap map;
+	private MapDrawer mapDrawer;
 	private GameGui gui;
 
 	public GameState() {
 		map = new GameMap(30, 30);
+		mapDrawer = new MapDrawer(map);
 		gui = new GameGui(Color.BLUE, Color.WHITE, Game.WIDTH, Game.HEIGHT);
 	}
 
@@ -26,13 +29,14 @@ public class GameState implements State {
 
 	@Override
 	public void draw(AsciiPanel term) {
-		map.drawCable(term);
+		mapDrawer.drawCables(term);
 		gui.draw(term);
 	}
 
 	@Override
 	public void respondToKeyPress(KeyEvent key) {
 		System.out.println(key.getKeyChar());
+		mapDrawer.scroll(1, 0);
 	}
 
 	@Override
