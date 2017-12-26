@@ -13,11 +13,17 @@ import asciiPanel.AsciiPanel;
 import newgame.states.GameState;
 import newgame.states.StateManager;
 
-public class Game  extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
+public class Game  extends JFrame implements KeyListener, MouseListener, MouseMotionListener, Runnable {
 	public static final int WIDTH = 132;
 	public static final int HEIGHT = 43;
 
 	private AsciiPanel terminal;
+
+	private boolean running;
+
+	private long lastLoopTime = System.nanoTime();
+	private long currentTime;
+	private double deltaTime;
 
 	public Game() {
 		super();
@@ -30,10 +36,36 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 		getContentPane().addMouseListener(this);		// Adding to the content pane instead of the JFrame ensures the mouse coords do not include the title bar of the window.
 		getContentPane().addMouseMotionListener(this);
 
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+
 		StateManager.runState(new GameState());
 
 		repaint();
+
+		Thread thread = new Thread(this);
+		running = true;
+		thread.start();
 	}
+
+	@Override
+	public void run() {
+		while(running) {
+			currentTime = System.nanoTime();
+			deltaTime += currentTime - lastLoopTime;
+			lastLoopTime = currentTime;
+
+			while(deltaTime >= 1) {
+				update();
+				deltaTime--;
+			}
+
+			repaint();
+		}
+	}
+
+	public void update() {}
 
 	@Override
 	public void repaint() {
@@ -43,6 +75,20 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 		StateManager.getCurrentState().display(terminal);
 		super.repaint();
 	}
+
+	private int[] getMouseCharPos(int mouseX, int mouseY) {
+		// This takes the mouse's position in pixels and find its position in terms of characters in the terminal.
+
+		int width = terminal.getCharWidth();
+		int height = terminal.getCharHeight();
+
+		int charX = (int) Math.floor(mouseX / width);
+		int charY = (int) Math.floor(mouseY / height);
+
+		return new int[] {charX, charY};
+	}
+
+	// INPUT LISTENERS
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -95,27 +141,11 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 	public void keyTyped(KeyEvent e) {
 	}
 
-
-
 	@Override
 	public void mouseDragged(MouseEvent e) {
 	}
 
-	private int[] getMouseCharPos(int mouseX, int mouseY) {
-		// This takes the mouse's position in pixels and find its position in terms of characters in the terminal.
-
-		int width = terminal.getCharWidth();
-		int height = terminal.getCharHeight();
-
-		int charX = (int) Math.floor(mouseX / width);
-		int charY = (int) Math.floor(mouseY / height);
-
-		return new int[] {charX, charY};
-	}
-
 	public static void main(String[] args) {
 		Game app = new Game();
-		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		app.setVisible(true);
 	}
 }
