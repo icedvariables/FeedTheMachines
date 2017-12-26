@@ -25,6 +25,7 @@ public class MapDrawer {
 		}
 	}
 
+	// TODO: Do not attempt to draw off screen (ie. only draw titles that are actually on screen).
 
 	public void drawCables(AsciiPanel term) {
 		for(int x = 0; x < map.getWidth(); x++) {
