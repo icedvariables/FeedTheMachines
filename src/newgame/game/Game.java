@@ -13,17 +13,18 @@ import asciiPanel.AsciiPanel;
 import newgame.states.GameState;
 import newgame.states.StateManager;
 
-public class Game  extends JFrame implements KeyListener, MouseListener, MouseMotionListener, Runnable {
+public class Game  extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
 	public static final int WIDTH = 132;
 	public static final int HEIGHT = 43;
 
+	public static final int FPS = 20;
+	public static final float TIME_BETWEEN_FRAMES = 1_000_000_000 / FPS;
+
 	private AsciiPanel terminal;
 
-	private boolean running;
+	private boolean running = true;
 
-	private long lastLoopTime = System.nanoTime();
-	private long currentTime;
-	private double deltaTime;
+	private double lastTime = System.nanoTime();
 
 	public Game() {
 		super();
@@ -42,37 +43,34 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 
 		StateManager.runState(new GameState());
 
-		repaint();
-
-		Thread thread = new Thread(this);
-		running = true;
-		thread.start();
+		loop();
 	}
 
-	@Override
-	public void run() {
+	public void loop() {
 		while(running) {
-			currentTime = System.nanoTime();
-			deltaTime += currentTime - lastLoopTime;
-			lastLoopTime = currentTime;
+			double currentTime = System.nanoTime();
 
-			while(deltaTime >= 1) {
+			//System.out.println("Current: " + currentTime + " Last: " + lastTime);
+
+			if((currentTime - lastTime) >= TIME_BETWEEN_FRAMES) {
+				System.out.println((currentTime - lastTime));
 				update();
-				deltaTime--;
+				repaint();
+				lastTime = System.nanoTime();
 			}
-
-			repaint();
 		}
 	}
 
-	public void update() {}
+	public void update() {
+		StateManager.getCurrentState().update();
+	}
 
 	@Override
 	public void repaint() {
 		// Clears the terminal window, allows the current state to draw and then repaints.
 
 		terminal.clear();
-		StateManager.getCurrentState().display(terminal);
+		StateManager.getCurrentState().draw(terminal);
 		super.repaint();
 	}
 

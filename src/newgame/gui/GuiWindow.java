@@ -5,9 +5,10 @@ import java.util.List;
 
 import asciiPanel.AsciiPanel;
 import newgame.game.Drawable;
+import newgame.game.Updatable;
 import newgame.gui.components.Component;
 
-public class GuiWindow implements Drawable {
+public class GuiWindow implements Drawable, Updatable {
 	private final char HORIZONTAL_CHAR = (char) 196;
 	private final char VERTICAL_CHAR = (char) 179;
 	private final char TOPLEFT_CHAR = (char) 218;
@@ -65,5 +66,9 @@ public class GuiWindow implements Drawable {
 
 		// Draw title:
 		term.write(title, x + 2, y, titleColour);
+	}
+
+	@Override
+	public void update() {
 	}
 }

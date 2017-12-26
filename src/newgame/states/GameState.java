@@ -21,10 +21,11 @@ public class GameState implements State {
 
 	@Override
 	public void update() {
+		gui.update();
 	}
 
 	@Override
-	public void display(AsciiPanel term) {
+	public void draw(AsciiPanel term) {
 		map.drawCable(term);
 		gui.draw(term);
 	}
