@@ -16,4 +16,12 @@ public class Component {
 	public void drawWithinGui(AsciiPanel term, int guiX, int guiY) {
 		term.write(text, x + guiX, y + guiY);
 	}
+
+	public void mouseClick() {
+		// Called when the user clicks on this component.
+	}
+
+	public void mouseHover() {
+		// Called when the user has the mouse over this component.
+	}
 }

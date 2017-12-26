@@ -11,14 +11,13 @@ import javax.swing.JFrame;
 
 import asciiPanel.AsciiPanel;
 import newgame.states.GameState;
-import newgame.states.State;
+import newgame.states.StateManager;
 
 public class Game  extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
 	public static final int WIDTH = 132;
 	public static final int HEIGHT = 43;
 
 	private AsciiPanel terminal;
-	private State currentState;
 
 	public Game() {
 		super();
@@ -31,7 +30,7 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 		getContentPane().addMouseListener(this);		// Adding to the content pane instead of the JFrame ensures the mouse coords do not include the title bar of the window.
 		getContentPane().addMouseMotionListener(this);
 
-		currentState = new GameState();
+		StateManager.runState(new GameState());
 
 		repaint();
 	}
@@ -41,7 +40,7 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 		// Clears the terminal window, allows the current state to draw and then repaints.
 
 		terminal.clear();
-		currentState.display(terminal);
+		StateManager.getCurrentState().display(terminal);
 		super.repaint();
 	}
 
@@ -54,13 +53,13 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 		int charX = charPos[0];
 		int charY = charPos[1];
 
-		currentState.respondToMouseClick(charX, charY);
+		StateManager.getCurrentState().respondToMouseClick(charX, charY);
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// Allows the current state to respond to input and (if required) return a new state to become the current state.
-		currentState = currentState.respondToKeyPress(e);
+		StateManager.getCurrentState().respondToKeyPress(e);
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class Game  extends JFrame implements KeyListener, MouseListener, MouseMo
 		int charX = charPos[0];
 		int charY = charPos[1];
 
-		currentState.respondToMouseMove(charX,  charY);
+		StateManager.getCurrentState().respondToMouseMove(charX,  charY);
 	}
 
 	@Override
