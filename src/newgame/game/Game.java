@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JFrame;
 
@@ -12,7 +13,7 @@ import asciiPanel.AsciiPanel;
 import newgame.states.GameState;
 import newgame.states.State;
 
-public class Game  extends JFrame implements KeyListener, MouseListener {
+public class Game  extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
 	public static final int WIDTH = 132;
 	public static final int HEIGHT = 43;
 
@@ -23,11 +24,12 @@ public class Game  extends JFrame implements KeyListener, MouseListener {
 		super();
 		terminal = new AsciiPanel(WIDTH, HEIGHT);
 		terminal.setDefaultForegroundColor(Color.WHITE);
-		add(terminal);
+		getContentPane().add(terminal);
 		pack();
 
 		addKeyListener(this);
-		addMouseListener(this);
+		getContentPane().addMouseListener(this);		// Adding to the content pane instead of the JFrame ensures the mouse coords do not include the title bar of the window.
+		getContentPane().addMouseMotionListener(this);
 
 		currentState = new GameState();
 
@@ -46,13 +48,28 @@ public class Game  extends JFrame implements KeyListener, MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// When the mouse is clicked, the current state is given the coordinates of the click in characters (not pixels).
-	
+
 		// TODO: Potentially add a Coordinate class instead of integer arrays?
 		int[] charPos = getMouseCharPos(e.getX(), e.getY());
 		int charX = charPos[0];
 		int charY = charPos[1];
-		
+
 		currentState.respondToMouseClick(charX, charY);
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// Allows the current state to respond to input and (if required) return a new state to become the current state.
+		currentState = currentState.respondToKeyPress(e);
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		int[] charPos = getMouseCharPos(e.getX(), e.getY());
+		int charX = charPos[0];
+		int charY = charPos[1];
+
+		currentState.respondToMouseMove(charX,  charY);
 	}
 
 	@Override
@@ -72,28 +89,28 @@ public class Game  extends JFrame implements KeyListener, MouseListener {
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
-		// Allows the current state to respond to input and (if required) return a new state to become the current state.
-		currentState = currentState.respondToKeyPress(e);
-	}
-
-	@Override
 	public void keyReleased(KeyEvent e) {
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
-	
+
+
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+	}
+
 	private int[] getMouseCharPos(int mouseX, int mouseY) {
 		// This takes the mouse's position in pixels and find its position in terms of characters in the terminal.
-		
+
 		int width = terminal.getCharWidth();
 		int height = terminal.getCharHeight();
-		
+
 		int charX = (int) Math.floor(mouseX / width);
 		int charY = (int) Math.floor(mouseY / height);
-		
+
 		return new int[] {charX, charY};
 	}
 
